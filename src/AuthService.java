@@ -11,7 +11,7 @@ public class AuthService {
 
 
 
-public void register (String name, String email, String password, String role){
+public void register (String name,Integer age, String email, String password, String role ,CustomerType CustomerType){
     if (email == null || email.trim().isEmpty()){
     System.out.println("gecersiz email");
     return;
@@ -32,7 +32,7 @@ public void register (String name, String email, String password, String role){
         return;
     }
     String hashedPassword = service.hashPassword(password);
-    User newUser = new User(name, users.size() + 1, email, hashedPassword, role);
+    User newUser = new User(name,age,users.size() + 1, email, hashedPassword, role ,CustomerType);
     users.add(newUser);
     System.out.println("Kayıt başarılı ✅");
 

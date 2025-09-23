@@ -8,6 +8,8 @@ public class VehicleService {
 
     public List<Vehicle> getVehicles() {
         return vehicles;
+
+
     }
 
     public void setVehicles(List<Vehicle> vehicles) {
