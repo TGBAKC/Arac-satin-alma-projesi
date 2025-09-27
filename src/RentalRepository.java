@@ -29,9 +29,15 @@ public class RentalRepository {
 
 
     public List<Rental> listByVehicle(int vehicleId){
-
-        return null;
+        List<Rental> result = new ArrayList<>();
+        for (Rental r : rentals) {
+            if (r.getVehicleId() == vehicleId) {
+                result.add(r);
+            }
+        }
+        return result;
     }
+
 
 
 

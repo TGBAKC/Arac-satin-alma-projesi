@@ -1,21 +1,15 @@
 public class Main {
     public static void main(String[] args) {
+        AuthService auth = new AuthService();
+        Menu.start(auth);
 
-        Service service = new Service();
-
-        String email = Menu.getEmail();
-        String password = Menu.getPassword();
-
-        // Email doğrulama
-        boolean isValid = service.validateEmail(email);
-        if (!isValid) {
-            System.out.println("Geçersiz email ❌");
-            return; // programı bitir
+        User current = auth.getCurrentUser();
+        if (current != null && "ADMIN".equalsIgnoreCase(current.getRole())) {
+            new AdminMenu().start();
+        } else if (current != null) {
+            new CustomerMenu(current).start();
+        } else {
+            System.out.println("No user logged in. Exiting...");
         }
-
-        // Parola hashleme
-        String passwordHash = service.hashPassword(password);
-        System.out.println("Email: " + email);
-        System.out.println("SHA-256 ile hashlenmiş şifre: " + passwordHash);
     }
 }

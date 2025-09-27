@@ -1,104 +1,52 @@
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class AuthService {
-    private final Service service = new Service();
+    private final Service service = new Service();           // for hashPassword
+    private final UserRepository userRepo = new JdbcUserRepository();
     private User currentUser;
 
- private List<User> users =  new ArrayList<>() ;
+    public void register(String name, Integer age, String email, String password,
+                         String role, CustomerType customerType) {
 
-
-
-
-public void register (String name,Integer age, String email, String password, String role ,CustomerType CustomerType){
-    if (email == null || email.trim().isEmpty()){
-    System.out.println("gecersiz email");
-    return;
-
-}
-    if(!email.contains("@")){
-        System.out.println("email formati gecersiz");
-        return;
-    }
-   for (User user : users){
-       if (user.getEmail().equals(email)){
-           System.out.println("bu email zaten kayitli");
-           return;
-       }
-   }
-    if (password == null || password.trim().isEmpty()) {
-        System.out.println("geçersiz şifre" );
-        return;
-    }
-    String hashedPassword = service.hashPassword(password);
-    User newUser = new User(name,age,users.size() + 1, email, hashedPassword, role ,CustomerType);
-    users.add(newUser);
-    System.out.println("Kayıt başarılı ✅");
-
-
-
-
-}
-
-public void login(String email, String password){
-    if (email == null || email.trim().isEmpty()){
-        System.out.println("gecersiz email");
-        return;
-
-    }
-    if(!email.contains("@")){
-        System.out.println("email formati gecersiz");
-        return;
-    }
-    User foundUser = null;
-
-    for (User user : users){
-
-        if (user.getEmail().equals(email)){
-
-            foundUser = user;
-            break;
-
+        if (email == null || email.isBlank() || !email.contains("@")) {
+            System.out.println("Invalid email");
+            return;
+        }
+        if (userRepo.existsByEmail(email)) {
+            System.out.println("This email is already registered");
+            return;
+        }
+        if (password == null || password.isBlank()) {
+            System.out.println("Invalid password");
+            return;
         }
 
+        String hashed = service.hashPassword(password);
+        User u = new User(name, age, null, email, hashed, role, customerType);
+        userRepo.create(u); // save to DB
+        System.out.println("Registration successful ✅ (id=" + u.getId() + ")");
     }
 
-    if (foundUser == null){
-        System.out.println("email bulunamamdi");
-        return;
+    public void login(String email, String password){
+        if (email == null || email.isBlank() || !email.contains("@")) {
+            System.out.println("Invalid email");
+            return;
+        }
+        User found = userRepo.findByEmail(email);
+        if (found == null) {
+            System.out.println("Email not found");
+            return;
+        }
+        if (password == null || password.isBlank()) {
+            System.out.println("Invalid password");
+            return;
+        }
+        String hashed = service.hashPassword(password);
+        if (found.getPasswordHash().equals(hashed)) {
+            currentUser = found;
+            System.out.println("Login successful ✅ Welcome " + found.getName());
+        } else {
+            System.out.println("Incorrect password");
+        }
     }
 
-    if(password == null || password.trim().isEmpty()){
-        System.out.println("geceersiz password");
-        return;
-    }
-
-
-   String hashedPassword =service.hashPassword(password);
-
-   if(foundUser.getPasswordHash().equals(hashedPassword)) {
-    currentUser = foundUser;
-    System.out.println("giris basarili");
-   }
-   else{
-    System.out.println("sifre hatali");
-   }
-
-   }
-
-
-
-
-
-
-
-
-
-    public User getCurrentUser() {
-        return currentUser;
-    }
-
-
-
+    public User getCurrentUser() { return currentUser; }
 }
